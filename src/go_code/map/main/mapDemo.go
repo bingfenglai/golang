@@ -6,7 +6,7 @@ func main() {
 
 	map1()
 	map2()
-
+	map3()
 }
 
 func map1() {
@@ -22,6 +22,8 @@ func map1() {
 	peopleMap["04"] = "楠小茽"
 
 	fmt.Println(peopleMap)
+
+
 }
 
 func map2() {
@@ -32,6 +34,18 @@ func map2() {
 	m["no3"] = "向东"
 	m["no4"] = "向西"
 
-	fmt.Print(m)
+	fmt.Println(m)
 
+}
+
+func map3() {
+
+	m2 := map[string]string{
+		"小明":"小朋友",
+		"小张": "是个大人",
+		"小李": "是个司机",
+		"小王": "家住隔壁",
+	}
+
+	fmt.Print(m2)
 }
