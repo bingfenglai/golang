@@ -380,7 +380,9 @@ name:  向东 gender:  male
 
 ## 写在最后
 
-本文当中使用到的demo链接：
+本文当中使用到的demo链接吧👉：[code81192/golang: Go语言学习笔记&Demo (github.com)](https://github.com/code81192/golang)
+
+如果你觉得这篇文章对你有所帮助，请点个赞鼓励一下，如有错漏的地方欢迎指正🤝
 
 
 
