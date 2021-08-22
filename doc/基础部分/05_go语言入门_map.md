@@ -284,6 +284,114 @@ func traverse2() {
 
 在前文当中我们说到，map它是无序的，那么，我们应当如何对它进行有序的遍历呢？
 
+实现思路是这个样子的，我们首先使用`for range` 遍历map当中的key，并将其存入到一个切片（slice）`keyArray`当中，然后对数组进行排序，最后再遍历数组`keyArray` ，并将map当中key对应的值取出。
+
+```go
+func orderlyTraversal(){
+
+	var m  map[string]string
+	m = make(map[string]string,4)
+
+	// 添加元素
+	m["小明"] = "一听就是个小朋友"
+	m["小张"] = "一听就是个大人"
+	m["小李"] = "一听就是个司机"
+	m["小王"] = "一听家就住在不远"
+
+	var keyArray []string
+
+	for key := range m{
+		keyArray = append(keyArray, key)
+	}
+	sort.Strings(keyArray)
+
+	for i := 0; i < len(keyArray); i++ {
+		fmt.Println(keyArray[i],m[keyArray[i]])
+	}
+
+}
+
+func main(){
+    orderlyTraversal()
+}
+```
+
+输出：
+
+```
+小张 一听就是个大人
+小明 一听就是个小朋友
+小李 一听就是个司机
+小王 一听家就住在不远
+```
+
+## slice  of  map 
+
+当切片（slice）的数据类型为map时，我们称之为“slice of map”, map的切片，它是可以动态变化的。
+
+便于大家理解这个数据结构，我这里举个案例。需求是这个样子的，我们需要一个数据结构用于存储学生（student）的信息，包括name、gender等属性，要求这个数据结构可以动态地变更学生的数量。
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	var students []map[string]string
+
+	student1 := map[string]string{
+		"name": "向北",
+		"gender": "male",
+	}
+	students = append(students, student1)
+    
+	student2 := map[string]string{
+		"name": "向东",
+		"gender": "male",
+	}
+	
+	students = append(students, student2)
+
+	for _, student := range students {
+
+		fmt.Println("name: ",student["name"],"gender: ",student["gender"])
+	}
+
+}
+
+```
+
+输出：
+
+```
+name:  向北 gender:  male
+name:  向东 gender:  male
+```
+
+可以看到，当需要动态地添加元素时，只要使用内置函数append就可以了。
+
+## map的使用细节
+
+1. map是引用数据类型，遵守引用数据类型的传递机制，在一个函数中接收map,修改后，会直接修改原先的map
+2. map使用容量达到上前上限值后，会自动扩容，并不会发生panic
+3. map的`value`经常是`struct`结构体类型，更适合于管理复杂的数据
+
+## 写在最后
+
+本文当中使用到的demo链接：
+
+
+
+
+
+
+
+
+
+
+
 
 
 
