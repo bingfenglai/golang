@@ -19,12 +19,12 @@ func sayHello(name string) {
 
 func getPhoneByName(name string) string {
 
-	return name+" 的手机号是 " + "139-6379-3306"
+	return name+" 的手机号是 " + "120-6379-3306"
 }
 
 
 func getPhoneByName2(name string) (str string){
-	str = name+" 的手机号是 " + "139-6379-3306"
+	str = name+" 的手机号是 " + "120-6379-3306"
 	return
 }
 

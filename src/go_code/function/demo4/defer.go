@@ -7,9 +7,9 @@ func main() {
 }
 
 func sayHello(name string) {
-	fmt.Println("before")
+	fmt.Println("before1")
 	defer fun1()
-	fmt.Println("after")
+	fmt.Println("before2")
 }
 
 func fun1() {
