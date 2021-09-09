@@ -14,3 +14,5 @@ func NewImmortal(age int, name, gender string) *immortal {
 func (recv *immortal) GetName() string {
 	return recv.name
 }
+
+

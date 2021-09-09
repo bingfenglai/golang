@@ -6,3 +6,4 @@ type immortal struct {
 	age    int
 	gender string
 }
+
