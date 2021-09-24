@@ -10,7 +10,7 @@ func main() {
 
 	buf := make([]byte, 1024)
 
-	inputFile, err := os.Open("G:\\06_golangProject\\golang\\doc\\筑基部分\\10_golang中的读写数据.md")
+	inputFile, err := os.Open("古丹丹方.txt")
 	defer inputFile.Close()
 	if err != nil {
 		fmt.Println(err)
