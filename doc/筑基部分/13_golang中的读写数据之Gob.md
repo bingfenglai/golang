@@ -1,4 +1,4 @@
-# golang中的读写数据之Gob与Go中的密码学
+# golang中的读写数据之Gob
 
 ## 写在前面
 
