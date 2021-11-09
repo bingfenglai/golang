@@ -177,6 +177,78 @@ end...
 
 ## 自定义包中的错误处理和 panicking
 
+在自定义包中的错误处理时，我们遵循以下原则：
+
+1. 在包内部，总是应该和`panic` 中`recover`: 不应该显式的超出包范围的`panic` ()
+2. 向包的调用者返回错误值
+
+请看下面的例子：
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	var name []string
+	name = append(name, "韩立","","南宫婉")
+
+	for i, _ := range name {
+
+		err := SayHello(name[i])
+		if err != nil {
+			fmt.Println(err)
+		}
+		continue
+	}
+
+}
+
+func SayHello(name string) (err error) {
+	defer func()  {
+		if r := recover(); r != nil {
+			//var ok bool
+				err = fmt.Errorf("%v",r)
+		}
+	}()
+	// 注意： 抛出panic的函数必须在defer之后调用
+	doSayHello(name)
+	return nil
+
+}
+
+func doSayHello(name string) {
+	if len(name)==0 {
+		panic("名字不能是一个空字符串")
+
+	}
+	fmt.Printf("hello %s\n", name)
+
+
+}
+
+```
+
+```go
+hello 韩立
+名字不能是一个空字符串
+hello 南宫婉
+```
+
+
+
+在这个例子当中，包内从`panic`中`recover`，并返回给调用者错误提示，使得程序可以继续往下执行。重要的事情多说几遍，**panic**的使用应当严格地限制其场景，尽可能地使程序从**panic**中**recover**
+
+## 使用闭包优雅地处理错误
+
+像上面的代码一样，每当调用函数时，必须检查错误是否发生，这将增加代码的重复率，到处充斥着错误检查，这一点都不优雅。那么，在Golang中有没有机制像Java当中一样，可以统一地对错误进行处理呢？
+
+请看下面的例子：
+
+
+
 
 
 
