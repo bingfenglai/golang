@@ -247,6 +247,66 @@ hello 南宫婉
 
 请看下面的例子：
 
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+var f1 = func(name string) error{
+	if name != "" {
+		println("Hello! ",name)
+
+	}else {
+		return errors.New("姓名不能为空")
+	}
+
+	return nil
+}
+
+func main() {
+
+	errorHandler("",f1)
+
+}
+
+func errorHandler(name string,f1 func(s string) error)  {
+	defer func() {
+		if r := recover();r!=nil {
+			fmt.Println(r)
+		}
+	}()
+
+	err := f1(name)
+	check(err)
+
+}
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+```
+
+程序输出：
+
+```
+姓名不能为空
+```
+
+
+
+在这个例子当中，`errorHandler`是一个包装函数。它有两个参数，一个是`string` 类型的参数`name`,另一个则是匿名函数`f1` 。在`errorHandler`函数当中将调用函数`f1`,并通过`check`函数对程序执行进行校验这时，所有的错误都将被recover.
+
+## 写在最后
+
+关于Golang当中的错误处理我们就初步介绍到这里。
+
+本文当中涉及到的例子可以[点击此处下载](https://github.com/bingfenglai/golang)。如果我的学习笔记能够给你带来帮助，还请多多点赞鼓励。文章如有错漏之处还请各位小伙伴帮忙斧正。
+
 
 
 
