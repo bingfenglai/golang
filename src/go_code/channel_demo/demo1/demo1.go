@@ -10,9 +10,7 @@ func main() {
 	go sendData(ch)
 	go sayHello(ch, ch1)
 
-	for <-ch1 != "EOF" {
-
-	}
+	<-ch1
 
 }
 
