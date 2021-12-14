@@ -1,4 +1,4 @@
-# golang中的协程与通道（下）
+# golang中的协程与通道（二）
 
 ## 写在前面
 
@@ -408,7 +408,59 @@ func main() {
 
 以上就是给通道使用for循环实现的迭代器,其中`container`为存放资源的容器。使用for循环遍历通道，意味着它从指定通道中读取数据直到通道关闭，才继续执行下边的代码。**写入完成后必须要关闭通道** 。因为Iter函数返回的是一个只读通道，它是没法关闭的。
 
-### 习惯用法2
+### 习惯用法2 ：生产者消费者模式
+
+假设存在生产者函数Produce()不断产生消费者consume()所需要的值，它们都可以运行在独立的协程中,那么你可以使用一下的写法:
+
+```go
+package main
+
+func main() {
+	
+	Consume(Produce(10))
+}
+
+func Produce(size int) <-chan int{
+	ch := make(chan int)
+	go func() {
+		for i:=0;i<size;i++ {
+			ch<-i
+		}
+		close(ch)
+	}()
+
+	return ch
+}
+
+func Consume(ch <-chan int) {
+	for i := range ch {
+		println("收到数据",i)
+	}
+}
+```
+
+程序输出：
+
+```go
+收到数据 0
+收到数据 1
+收到数据 2
+收到数据 3
+收到数据 4
+收到数据 5
+收到数据 6
+收到数据 7
+收到数据 8
+收到数据 9
+```
+
+## 写在最后
+
+关于
+
+
+
+
 
 
 
