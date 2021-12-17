@@ -9,29 +9,56 @@ type Interval struct {
 	maxValue    int
 	currentVale int
 	step        int
-	sync.Locker
+	lock        sync.Mutex
+}
+
+func NewInterval(maxValue, step int) *Interval {
+
+	return &Interval{
+		maxValue:    maxValue,
+		currentVale: 1,
+		step:        step,
+	}
+
 }
 
 func (receiver *Interval) getNextInterval() (min, max int) {
-	receiver.Lock()
-	defer receiver.Unlock()
+	receiver.lock.Lock()
+	defer receiver.lock.Unlock()
+
+	if receiver.currentVale >= receiver.maxValue {
+		panic("序列号已耗尽")
+	}
+
 	min = receiver.currentVale
 	max = receiver.currentVale + receiver.step
+	if max > receiver.maxValue {
+		max = receiver.maxValue
+	}
+	receiver.currentVale = max + 1
 	return min, max
 }
 
 var resume chan int
 
+var interval = NewInterval(99999, 1000)
+
 func intergers() chan int {
 	yeild := make(chan int)
-	count := 0
+	min, max := interval.getNextInterval()
 
 	go func() {
 		for {
-			yeild <- count
-			count++
+
+			if min < max {
+				yeild <- min
+				min++
+			} else {
+				min, max = interval.getNextInterval()
+			}
 
 		}
+
 	}()
 
 	return yeild
@@ -46,8 +73,13 @@ func main() {
 
 	s := fmt.Sprintf("%05d", 3)
 	fmt.Println(s)
-	fmt.Println(generateInteger())
-	fmt.Println(generateInteger())
-	fmt.Println(generateInteger())
+	for {
+		fmt.Println(fmt.Sprintf("%05d", generateInteger()))
+	}
+
+	//for  {
+	//	fmt.Println(interval.getNextInterval())
+	//
+	//}
 
 }
