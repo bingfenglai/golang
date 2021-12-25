@@ -1,85 +1,84 @@
 package main
 
 import (
-	fmt "fmt"
+	"fmt"
+	"go_code/channel_demo/gen/interval"
+	"runtime"
 	"sync"
+	"time"
 )
 
-type Interval struct {
-	maxValue    int
-	currentVale int
-	step        int
-	lock        sync.Mutex
-}
-
-func NewInterval(maxValue, step int) *Interval {
-
-	return &Interval{
-		maxValue:    maxValue,
-		currentVale: 1,
-		step:        step,
-	}
-
-}
-
-func (receiver *Interval) getNextInterval() (min, max int) {
-	receiver.lock.Lock()
-	defer receiver.lock.Unlock()
-
-	if receiver.currentVale >= receiver.maxValue {
-		panic("序列号已耗尽")
-	}
-
-	min = receiver.currentVale
-	max = receiver.currentVale + receiver.step
-	if max > receiver.maxValue {
-		max = receiver.maxValue
-	}
-	receiver.currentVale = max + 1
-	return min, max
-}
-
+// 声明一个chan int 类型的通道
 var resume chan int
 
-var interval = NewInterval(99999, 1000)
+// 区间实例
+var myInterval = interval.NewInterval(99999, 1000)
 
+type count struct {
+	i  int
+	mu sync.Mutex
+}
+
+func main() {
+	runtime.GOMAXPROCS(10)
+
+	// 初始化通道
+	resume = intergers()
+
+	count := count{
+		i: 0,
+	}
+
+	// 不断地获取下一个序列值并格式化打印
+	// 为了验证所有的协程获取的序列号不重复，每获取一个记录数count+1
+	for j := 10; j > 0; j-- {
+
+		go func() {
+
+			for {
+
+				fmt.Println(fmt.Sprintf("%05d", generateInteger()))
+				count.mu.Lock()
+				count.i = count.i + 1
+				count.mu.Unlock()
+			}
+		}()
+
+	}
+
+	time.Sleep(1e9 * 2)
+	println("总共获取：", count.i)
+
+}
+
+// 从chan int 通道当作获取下一个值
+func generateInteger() int {
+	return <-resume
+}
+
+// 获取一个chan int 类型的通道
 func intergers() chan int {
-	yeild := make(chan int)
-	min, max := interval.getNextInterval()
+	yield := make(chan int)
+	min, max, _ := myInterval.GetNextInterval()
+	var err error
+	// 开启一个协程，不断地向通道当中写入下一个序列号（阻塞的）
 
 	go func() {
 		for {
 
-			if min < max {
-				yeild <- min
+			if min <= max {
+				yield <- min
 				min++
 			} else {
-				min, max = interval.getNextInterval()
+				min, max, err = myInterval.GetNextInterval()
+				if err != nil {
+					return
+				}
 			}
 
 		}
 
 	}()
 
-	return yeild
-}
-
-func generateInteger() int {
-	return <-resume
-}
-
-func main() {
-	resume = intergers()
-
-	s := fmt.Sprintf("%05d", 3)
-	fmt.Println(s)
-	for {
-		fmt.Println(fmt.Sprintf("%05d", generateInteger()))
-	}
-
-	//for  {
-	//	fmt.Println(interval.getNextInterval())
-	//
-	//}
-
+	return yield
 }
