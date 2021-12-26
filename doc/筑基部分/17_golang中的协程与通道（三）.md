@@ -200,5 +200,44 @@ func intergers() chan int {
 总共获取： 99999
 ```
 
+## 实现 Futures 模式
+
+所谓的**Futures**指的是：在某些场景当中，我们使用某一个值之前需要先对其进行计算。在这种情况下，我们可以在另一个处理器上进行该值的计算，到使用时，该值就已经计算完毕。
+
+Futures类似于生成器，不同的地方在于Futures需要返回一个值。
+
+请看下面的例子：
+
+在某一场景当中，我们的程序需要不断地接收图片并对其进行特征提取。那么，我们应当如何实现呢？
+
+实现方式一：
+
+```go
+package main
+
+func main() {
+
+	file := receiverImagesFile()
+	resolve(file)
+
+}
+
+func receiverImagesFile()  string{
+	return "1.png"
+}
+
+func resolve(s string) {
+	println("对图片 "+s+" 进行特征提取")
+}
+```
+
+在这个方式当中，接收文件跟对文件进行处理采用同步的方式进行，分为接收函数`receiverImagesFile()`和处理函数`resolve（）` 。在这个简单的模式当中，因为是同步的，当接收函数正在接收文件时（IO相对而言是缓慢的），处理函数可能会存在空闲状态，这样会导致资源的浪费。
+
+那么，Futures模式是如何处理的呢？请看下面的例子：
+
+```go
+
+```
+
 
 
