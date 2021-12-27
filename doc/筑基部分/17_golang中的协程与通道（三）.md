@@ -236,8 +236,42 @@ func resolve(s string) {
 那么，Futures模式是如何处理的呢？请看下面的例子：
 
 ```go
+package main
 
+import (
+	"time"
+)
+
+func main() {
+	resolve()
+
+}
+
+func resolve() {
+
+	s := <-receiverImageFile()
+	time.Sleep(1e9 * 0.3)
+	println("文件" + s + "处理完毕")
+
+}
+
+func receiverImageFile() chan string {
+	ch := make(chan string)
+
+	go func() {
+
+		// 模拟接收文件过程
+		println("接收文件中...")
+		time.Sleep(1e9 * 1)
+		ch <- time.Now().Format("20060102150405") + ".png"
+
+	}()
+
+	return ch
+}
 ```
+
+在Futures当中，接收函数跟处理函数通过通道进行解耦。接收函数可以不断地接收新的图片文件，而处理函数不断地对图片进行运算。再给通道设置缓存后，两者之间可以（理想情况下）做到互不影响，使得资源利用率得到提升。并且，我们可以配置多数接收函数对应少数的处理函数，进而减少计算资源的等待时间。对于密集计算型任务，Futures模式可以使得API以异步的形式暴露出来，使得API调用方可以在等待结果的时间处理其他任务。
 
 
 
