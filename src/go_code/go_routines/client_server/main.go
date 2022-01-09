@@ -49,7 +49,7 @@ func server(do sayHello, service chan *request, quit chan int) {
 // 启动服务器方法
 // resp: 请求通道、退出信号通道
 func startServer(do sayHello) (seivice chan *request, quit chan int) {
-	seivice = make(chan *request)
+	seivice = make(chan *request, 4)
 	quit = make(chan int)
 	go server(do, seivice, quit)
 	return seivice, quit

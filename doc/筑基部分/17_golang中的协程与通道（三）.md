@@ -381,3 +381,25 @@ func main() {
 
 ## 通道在限制并发当中的应用
 
+我们知道，在硬件资源不变的情况下，计算机处理的最大请求数是固定。当某些极限情况下，可能会出现大量的请求打到计算机上，这时，可能会出现请求过载，导致计算机宕机。因此，我们需要将请求最大值限制在计算机能够处理的范围之内，也就是`限流`。在`Golang`中使用带有缓冲的通道就很容易实现这一点，**通道的缓冲大小就是同时处理请求的最大数量。**
+
+我们将上面的例子当中的`service`通道修改一下，在初始化时指定缓冲大小
+
+```go
+// 启动服务器方法
+// resp: 请求通道、退出信号通道
+func startServer(do sayHello) (seivice chan *request, quit chan int) {
+	seivice = make(chan *request,4)
+	quit = make(chan int)
+	go server(do, seivice, quit)
+	return seivice, quit
+
+}
+```
+
+这时，我们再次运行一下demo,就可以看到此时服务器函数同时接收到请求就扩大到了4.
+
+## 并行计算的应用
+
+
+
