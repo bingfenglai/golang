@@ -401,5 +401,11 @@ func startServer(do sayHello) (seivice chan *request, quit chan int) {
 
 ## 并行计算的应用
 
+现代计算机绝大多数都是多核心CPU。并行计算可以理解为：利用多个处理器协同求解同一问题的过程。接下来，我们通过一个demo了解Golang在并行计算上面的应用。
+
+
+
+
+
 
 
