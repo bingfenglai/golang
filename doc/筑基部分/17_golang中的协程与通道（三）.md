@@ -2,7 +2,7 @@
 
 ## 写在前面
 
-在前一篇文章《[golang中的协程与通道（二） ](https://bingfenglai.github.io/2021/12/15/golang/16_golang中的协程与通道（二）/)》当中，我们初步学习了通道的相关内容，并结合协程进行了简单的应用，接下来，我们将进一步学习该知识点。
+在前一篇文章《[golang中的协程与通道（二） ](https://bingfenglai.github.io/2021/12/15/golang/16_golang中的协程与通道（二）/)》当中，我们初步学习了通道的相关内容，并结合协程进行了简单的应用，接下来，我们将通过具体的练习来进一步学习该知识点。
 
 
 
@@ -402,6 +402,109 @@ func startServer(do sayHello) (seivice chan *request, quit chan int) {
 ## 并行计算的应用
 
 现代计算机绝大多数都是多核心CPU。并行计算可以理解为：利用多个处理器协同求解同一问题的过程。接下来，我们通过一个demo了解Golang在并行计算上面的应用。
+
+```go
+package main
+
+import (
+	"runtime"
+	"strconv"
+)
+
+// 数列求和函数
+func sum(list []int, ch chan int) error {
+	i := 0
+
+	for _, j := range list {
+		i = i + j
+	}
+	println("分段结果:" + strconv.Itoa(i))
+	ch <- i
+	return nil
+}
+
+// 参与运算的cpu数
+const cpu_num = 6
+
+func main() {
+	runtime.GOMAXPROCS(cpu_num)
+	var list = []int{1, 22, 31, 34, 52, 46, 87, 18, 91, 101, 161, 182}
+	ch := make(chan int, 2)
+	// 分为六等份
+	num := cap(list) / cpu_num
+	println("每份大小：" + strconv.Itoa(num))
+	for i := 0; i < cpu_num; i++ {
+		sub := list[i*num : i*num+num]
+		
+		go sum(sub, ch)
+
+	}
+	var total []int
+	for i := 0; i < cpu_num; i++ {
+		sum := <-ch
+		println("收到结果" + strconv.Itoa(sum))
+		total = append(total, sum)
+	}
+	println("结果长度", len(total))
+	for i := 0; i < len(total)-1; i++ {
+		println(total[i])
+	}
+
+	println("==========")
+	go sum(total, ch)
+
+	println(<-ch)
+
+}
+
+```
+
+输出：
+
+```go
+每份大小：2
+分段结果:23
+收到结果23
+分段结果:98
+收到结果98
+分段结果:343
+分段结果:192
+分段结果:65
+收到结果343
+收到结果192
+收到结果65
+分段结果:105
+收到结果105
+结果长度 6
+23
+98
+343
+192
+65
+==========
+分段结果:826
+826
+```
+
+在这个例子当中，存在一个长度为N的数组，我们需要对数组内的元素（元素是无规律的）进行求和。我们将其分为n（n为N的公约数且n小于计算机CPU核心数）等份，并通过协程去同时计算n等分的分段和，最后进行再对分段和组成的数组（可以再次切分为m等分，依次类推）进行求和。
+
+在这个例子当中，我们可以充分的利用资源进行协同求解，使得计算效率大大提升。
+
+## 通过通道来访问共享资源
+
+在这之前，我们为了安全地访问共享资源，一般通过加锁来实现。
+
+```go
+type Info struct {
+    mu sync.Mutex
+    // ... other fields, e.g.: Str string
+}
+```
+
+我们知道，对于通道内的元素，我们将其取出是具备顺序性的，因此，我们可不可利用此特性来实现对共享资源的访问呢？请看下面的例子：
+
+```go
+```
 
 
 

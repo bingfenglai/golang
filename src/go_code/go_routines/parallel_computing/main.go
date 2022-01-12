@@ -22,17 +22,13 @@ const cpu_num = 6
 
 func main() {
 	runtime.GOMAXPROCS(cpu_num)
-	var list = []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+	var list = []int{1, 22, 31, 34, 52, 46, 87, 18, 91, 101, 161, 182}
 	ch := make(chan int, 2)
 	// 分为六等份
 	num := cap(list) / cpu_num
 	println("每份大小：" + strconv.Itoa(num))
 	for i := 0; i < cpu_num; i++ {
 		sub := list[i*num : i*num+num]
-		//println("第"+ strconv.Itoa(i) +"等份")
-		//for _, i2 := range sub {
-		//	println(i2)
-		//}
 
 		go sum(sub, ch)
 
