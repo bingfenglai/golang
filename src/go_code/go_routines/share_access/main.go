@@ -5,11 +5,13 @@ import (
 	"time"
 )
 
+// 共享资源
 type Count struct {
 	count int
 	funCh chan func()
 }
 
+// 工厂函数
 func NewCount(i int) *Count {
 
 	count := &Count{
@@ -22,6 +24,7 @@ func NewCount(i int) *Count {
 	return count
 }
 
+// 后台协程方法
 func (receiver *Count) backend() {
 	for {
 		f := <-receiver.funCh
@@ -30,6 +33,7 @@ func (receiver *Count) backend() {
 	}
 }
 
+// 访问资源的方法
 func (receiver *Count) AddCount(count int) {
 	f := func() {
 		receiver.count = receiver.count + count
