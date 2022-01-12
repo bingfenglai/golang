@@ -516,7 +516,7 @@ type Count struct {
 	funCh chan func()
 }
 
-
+// 工厂函数
 func NewCount(i int) *Count {
 
 	count := &Count{
@@ -529,6 +529,7 @@ func NewCount(i int) *Count {
 	return count
 }
 
+// 后台协程方法
 func (receiver *Count) backend() {
 	for {
 		f := <-receiver.funCh
@@ -537,6 +538,7 @@ func (receiver *Count) backend() {
 	}
 }
 
+// 访问资源的方法
 func (receiver *Count) AddCount(count int) {
 	f := func() {
 		receiver.count = receiver.count + count
@@ -571,8 +573,15 @@ func main() {
 	println("直接访问的资源：", total)
 
 }
-
 ```
+
+在这个例子当中，我们分别通过通道和直接访问的方式操作资源，最后打印结果。可以看到，通过通道去组织对资源的访问，可以起到对资源加锁的作用。当然，这仅仅是一个简化的demo，虽然不能直接用于实际开发，但是这种方式给我们提供了在实际场景中并发编程对于资源访问方面提供了思路。
+
+## 写在最后
+
+在这篇文章当中，我们通过几个小案例跟大家探讨了关于协程、通道的应用，使得我们可以更好地掌握这些知识点。
+
+本文当中涉及到的例子可以[点击此处下载](https://github.com/bingfenglai/golang)。如果我的学习笔记能够给你带来帮助，还请多多点赞鼓励。文章如有错漏之处还请各位小伙伴帮忙斧正。
 
 
 
