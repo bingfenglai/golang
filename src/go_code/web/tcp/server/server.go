@@ -1,15 +1,22 @@
 package main
 
-import "net"
+import (
+	"fmt"
+	"go_code/web/tcp/constants"
+	"net"
+	"time"
+)
 
 func main() {
 
-	listen, err := net.Listen("tcp", "localhost:9527")
+	listen, err := net.Listen(constants.Protocol, constants.Addr)
 
 	if err != nil {
 		println("监听端口出错", err)
 		return
 
+	} else {
+		fmt.Printf("服务器启动完成 " + time.Now().Format("2006-01-02 15:04:05"))
 	}
 
 	for {
@@ -40,7 +47,9 @@ func doServerStuff(conn net.Conn) {
 
 		}
 
-		println("接收到数据：", string(buf[:read]))
+		println("\n 接收到数据：\n", string(buf[:read]))
+
+		conn.Write([]byte(" hello client " + conn.RemoteAddr().String()))
 	}
 
 }
