@@ -53,14 +53,14 @@ func main() {
 		return
 
 	} else {
-		fmt.Printf("服务器启动完成 " + time.Now().Format("2006-01-02 15:04:05"))
+		fmt.Println("服务器启动完成 " + time.Now().Format("2006-01-02 15:04:05"))
 	}
 
 	for {
 
 		accept, err := listen.Accept()
 		if err != nil {
-			println(err)
+			println("出现错误:\n", err.Error())
 			return
 
 		}
@@ -73,20 +73,34 @@ func main() {
 
 func doServerStuff(conn net.Conn) {
 
+	defer func() {
+		println("关闭连接")
+		conn.Close()
+	}()
+
 	for {
-		buf := make([]byte, 1024)
+		buf := make([]byte, 256)
 
 		read, err := conn.Read(buf)
 
 		if err != nil {
-			println(err)
+			if "EOF" == err.Error() {
+				println("数据读取结束")
+				return
+			}
+			println("出现错误:", err.Error())
 			return
 
 		}
 
-		println("\n 接收到数据：\n", string(buf[:read]))
+		println("接收到数据：")
+		println(string(buf[:read]))
+		_, err = conn.Write([]byte(" hello client " + conn.RemoteAddr().String()))
 
-		conn.Write([]byte(" hello client " + conn.RemoteAddr().String()))
+		if err != nil {
+			println("出现错误\n", err.Error())
+		}
+
 	}
 
 }
@@ -114,8 +128,10 @@ func main() {
 
 	conn, err := net.Dial(constants.Protocol, constants.Addr)
 
+	defer conn.Close()
+
 	if err != nil {
-		println("建立连接失败", err)
+		println("建立连接失败", err.Error())
 		return
 
 	} else {
@@ -123,14 +139,13 @@ func main() {
 	}
 	conn.Write([]byte("hello server " + time.Now().Format("2006-01-02 15:04:05")))
 
-
 	buf := make([]byte, 1024)
 	read, err := conn.Read(buf)
 
 	println("收到服务器发送来的消息")
 
 	if err != nil {
-		println("读取数据失败 ", err)
+		println("读取数据失败 ", err.Error())
 		return
 	}
 
@@ -144,9 +159,11 @@ func main() {
 服务器程序输出：
 
 ```go
-服务器启动完成 2022-01-16 16:06:56
- 接收到数据：
- hello server 2022-01-16 17:52:41
+服务器启动完成 2022-01-16 18:37:53
+接收到数据：
+hello server 2022-01-16 18:38:01
+数据读取结束
+关闭连接
 ```
 
 
@@ -156,10 +173,14 @@ func main() {
 ```go
 建立连接成功
 收到服务器发送来的消息
- hello client 127.0.0.1:2722
+ hello client 127.0.0.1:3471
 
 进程完成，并显示退出代码 0
 ```
+
+以上就是Go 关于tcp编程的一个简单的demo，其中主要应用到了net包和协程的相关知识点。
+
+## http 服务器demo
 
 
 
