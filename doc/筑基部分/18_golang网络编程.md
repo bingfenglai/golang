@@ -32,6 +32,135 @@ socket位于应用层与TCP/IP协议族通信的中间，相当于设计模式�
 
 ## Golang的TCP client-server Demo
 
+服务端程序：
+
+```go
+package main
+
+import (
+	"fmt"
+	"go_code/web/tcp/constants"
+	"net"
+	"time"
+)
+
+func main() {
+
+	listen, err := net.Listen(constants.Protocol, constants.Addr)
+
+	if err != nil {
+		println("监听端口出错", err)
+		return
+
+	} else {
+		fmt.Printf("服务器启动完成 " + time.Now().Format("2006-01-02 15:04:05"))
+	}
+
+	for {
+
+		accept, err := listen.Accept()
+		if err != nil {
+			println(err)
+			return
+
+		}
+
+		go doServerStuff(accept)
+
+	}
+
+}
+
+func doServerStuff(conn net.Conn) {
+
+	for {
+		buf := make([]byte, 1024)
+
+		read, err := conn.Read(buf)
+
+		if err != nil {
+			println(err)
+			return
+
+		}
+
+		println("\n 接收到数据：\n", string(buf[:read]))
+
+		conn.Write([]byte(" hello client " + conn.RemoteAddr().String()))
+	}
+
+}
+```
+
+在服务端程序当中，服务启动后，使用for无限循环接收客户端的请求并启动协程处理来自客户端的请求。
+
+
+
+客户端程序：
+
+```go
+package main
+
+import (
+	"fmt"
+	"go_code/web/tcp/constants"
+	"net"
+	"time"
+)
+
+func main() {
+
+	// 建立连接
+
+	conn, err := net.Dial(constants.Protocol, constants.Addr)
+
+	if err != nil {
+		println("建立连接失败", err)
+		return
+
+	} else {
+		fmt.Println("建立连接成功")
+	}
+	conn.Write([]byte("hello server " + time.Now().Format("2006-01-02 15:04:05")))
+
+
+	buf := make([]byte, 1024)
+	read, err := conn.Read(buf)
+
+	println("收到服务器发送来的消息")
+
+	if err != nil {
+		println("读取数据失败 ", err)
+		return
+	}
+
+	fmt.Println(string(buf[:read]))
+
+}
+```
+
+客户端启动后，与服务器建立连接，并向服务器发送数据。
+
+服务器程序输出：
+
+```go
+服务器启动完成 2022-01-16 16:06:56
+ 接收到数据：
+ hello server 2022-01-16 17:52:41
+```
+
+
+
+客户端程序输出：
+
+```go
+建立连接成功
+收到服务器发送来的消息
+ hello client 127.0.0.1:2722
+
+进程完成，并显示退出代码 0
+```
+
 
 
 

@@ -16,14 +16,14 @@ func main() {
 		return
 
 	} else {
-		fmt.Printf("服务器启动完成 " + time.Now().Format("2006-01-02 15:04:05"))
+		fmt.Println("服务器启动完成 " + time.Now().Format("2006-01-02 15:04:05"))
 	}
 
 	for {
 
 		accept, err := listen.Accept()
 		if err != nil {
-			println(err)
+			println("出现错误:\n", err.Error())
 			return
 
 		}
@@ -36,20 +36,34 @@ func main() {
 
 func doServerStuff(conn net.Conn) {
 
+	defer func() {
+		println("关闭连接")
+		conn.Close()
+	}()
+
 	for {
-		buf := make([]byte, 1024)
+		buf := make([]byte, 256)
 
 		read, err := conn.Read(buf)
 
 		if err != nil {
-			println(err)
+			if "EOF" == err.Error() {
+				println("数据读取结束")
+				return
+			}
+			println("出现错误:", err.Error())
 			return
 
 		}
 
-		println("\n 接收到数据：\n", string(buf[:read]))
+		println("接收到数据：")
+		println(string(buf[:read]))
+		_, err = conn.Write([]byte(" hello client " + conn.RemoteAddr().String()))
 
-		conn.Write([]byte(" hello client " + conn.RemoteAddr().String()))
+		if err != nil {
+			println("出现错误\n", err.Error())
+		}
+
 	}
 
 }
