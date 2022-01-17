@@ -34,17 +34,22 @@ func BaseHandler(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		handlerFunc(w, r)
 	} else {
+
+		w.WriteHeader(http.StatusNotFound)
 		_, _ = w.Write([]byte("请求资源不存在"))
+
 	}
 }
 
 func SayHelloHandler(w http.ResponseWriter, r *http.Request) {
 
+	// 获取get请求参数
 	name := r.URL.Query().Get("name")
 
 	if name != "" {
 		_, _ = w.Write([]byte("hello ! " + name))
 	} else {
+		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte("缺少参数name"))
 	}
 }
@@ -55,6 +60,7 @@ func SayGoodbyeHandler(w http.ResponseWriter, r *http.Request) {
 	if name != "" {
 		_, _ = w.Write([]byte("goodbye ! " + name))
 	} else {
+		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte("缺少参数name"))
 	}
 }
